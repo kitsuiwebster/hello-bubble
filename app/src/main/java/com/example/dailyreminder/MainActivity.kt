@@ -50,11 +50,16 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun enableNotifications() {
             runOnUiThread {
-                PreferenceManager.setNotificationsEnabled(this@MainActivity, true)
-                if (Build.VERSION.SDK_INT >= 33) {
-                    notifPerm.launch(Manifest.permission.POST_NOTIFICATIONS)
-                } else {
-                    askExactAlarmThenStart()
+                // Prevent race conditions with synchronized
+                synchronized(this@MainActivity) {
+                    if (!PreferenceManager.areNotificationsEnabled(this@MainActivity)) {
+                        PreferenceManager.setNotificationsEnabled(this@MainActivity, true)
+                        if (Build.VERSION.SDK_INT >= 33) {
+                            notifPerm.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            askExactAlarmThenStart()
+                        }
+                    }
                 }
             }
         }
@@ -62,8 +67,13 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun disableNotifications() {
             runOnUiThread {
-                PreferenceManager.setNotificationsEnabled(this@MainActivity, false)
-                AlarmScheduler.cancelNext(this@MainActivity)
+                // Prevent race conditions with synchronized
+                synchronized(this@MainActivity) {
+                    if (PreferenceManager.areNotificationsEnabled(this@MainActivity)) {
+                        PreferenceManager.setNotificationsEnabled(this@MainActivity, false)
+                        AlarmScheduler.cancelNext(this@MainActivity)
+                    }
+                }
             }
         }
         

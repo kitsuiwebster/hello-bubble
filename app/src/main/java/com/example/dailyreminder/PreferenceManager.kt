@@ -60,8 +60,19 @@ object PreferenceManager {
         if (nextScheduledTime == 0L) return false
         
         val now = System.currentTimeMillis()
-        // If we have a scheduled time in the future, consider it valid
-        return nextScheduledTime > now
+        if (nextScheduledTime <= now) return false
+        
+        // Check if the scheduled time is actually TODAY (not tomorrow)
+        val todayStart = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        
+        val todayEnd = todayStart + TimeUnit.DAYS.toMillis(1) - 1
+        
+        return nextScheduledTime in todayStart..todayEnd
     }
     
     // Message tracking methods

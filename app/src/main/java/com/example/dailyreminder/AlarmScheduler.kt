@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import java.util.Calendar
 
 object AlarmScheduler {
@@ -12,11 +13,13 @@ object AlarmScheduler {
     fun scheduleNext(context: Context) {
         // Only schedule if notifications are enabled
         if (!PreferenceManager.areNotificationsEnabled(context)) {
+            Log.d("AlarmScheduler", "Notifications disabled, not scheduling")
             return
         }
         
         // Don't schedule if we already have an alarm scheduled for today
-        if (PreferenceManager.hasAlarmAlreadyScheduledForToday(context)) {
+        if (SafePreferenceManager.hasAlarmAlreadyScheduledForToday(context)) {
+            Log.d("AlarmScheduler", "Alarm already scheduled for today, skipping")
             return
         }
         
@@ -44,6 +47,13 @@ object AlarmScheduler {
         
         // Store the scheduled time
         PreferenceManager.setNextScheduledTime(context, trigger.timeInMillis)
+        Log.d("AlarmScheduler", "Main alarm scheduled for: ${trigger.time}")
+        
+        // Also schedule backup alarm for tomorrow
+        BackupAlarmScheduler.scheduleBackupForTomorrow(context)
+        
+        // Schedule fallback alarm as last resort
+        FallbackAlarmScheduler.scheduleFallbackIfNeeded(context)
     }
 
     fun cancelNext(context: Context) {
@@ -55,6 +65,11 @@ object AlarmScheduler {
         alarmManager.cancel(pi)
         // Clear the scheduled time
         PreferenceManager.setNextScheduledTime(context, 0L)
+        Log.d("AlarmScheduler", "Main alarm cancelled")
+        
+        // Also cancel backup alarm and fallback alarm
+        BackupAlarmScheduler.cancelBackupAlarm(context)
+        FallbackAlarmScheduler.cancelFallbackAlarm(context)
     }
     
     fun forceScheduleForTomorrow(context: Context) {
@@ -81,5 +96,12 @@ object AlarmScheduler {
         
         // Store the scheduled time
         PreferenceManager.setNextScheduledTime(context, trigger.timeInMillis)
+        Log.d("AlarmScheduler", "Force scheduled for tomorrow: ${trigger.time}")
+        
+        // Also schedule backup alarm for tomorrow
+        BackupAlarmScheduler.scheduleBackupForTomorrow(context)
+        
+        // Schedule fallback alarm as last resort
+        FallbackAlarmScheduler.scheduleFallbackIfNeeded(context)
     }
 }
