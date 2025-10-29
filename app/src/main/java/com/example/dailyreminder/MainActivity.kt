@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity() {
                 scheduleInSeconds(30)
             }
         }
+        
     }
 
     private fun askExactAlarmThenStart() {

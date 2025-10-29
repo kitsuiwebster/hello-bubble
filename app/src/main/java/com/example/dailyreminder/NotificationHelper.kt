@@ -23,13 +23,16 @@ object NotificationHelper {
 
             val text = content ?: "Coucou 👋" // Fallback if no content provided
             
-            // Truncate extremely long messages to prevent crashes
-            val truncatedText = if (text.length > 500) text.take(497) + "..." else text
-
+            // Always use BigText style for expandable notifications
+            val shortText = if (text.length > 50) text.take(47) + "..." else text
+            
             val notif = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_popup_reminder)
                 .setContentTitle("Hello Bubble")
-                .setContentText(truncatedText)
+                .setContentText(shortText)
+                .setStyle(NotificationCompat.BigTextStyle()
+                    .bigText(text)
+                    .setBigContentTitle("Hello Bubble"))
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)

@@ -72,3 +72,4 @@ function notificationsEnabled() {
     btn.classList.add('enabled');
     updateStatusIndicator(true);
 }
+
