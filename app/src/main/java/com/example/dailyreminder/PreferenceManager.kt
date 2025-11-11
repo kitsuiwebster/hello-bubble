@@ -52,7 +52,9 @@ object PreferenceManager {
     
     private fun getCurrentDateString(): String {
         val cal = Calendar.getInstance()
-        return "${cal.get(Calendar.YEAR)}-${cal.get(Calendar.MONTH)+1}-${cal.get(Calendar.DAY_OF_MONTH)}"
+        val month = cal.get(Calendar.MONTH) + 1
+        val day = cal.get(Calendar.DAY_OF_MONTH)
+        return "${cal.get(Calendar.YEAR)}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
     }
     
     fun hasAlarmAlreadyScheduledForToday(context: Context): Boolean {

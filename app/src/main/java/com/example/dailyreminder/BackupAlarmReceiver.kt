@@ -24,7 +24,7 @@ class BackupAlarmReceiver : BroadcastReceiver() {
                 
                 // Send backup notification
                 val message = MessageRepository.randomMessage(context)
-                NotificationHelper.showNow(context, "⚠️ Backup: $message")
+                NotificationHelper.showNow(context, message)
                 
                 // Mark as sent and track message
                 PreferenceManager.markNotificationSentToday(context)

@@ -24,7 +24,7 @@ class FallbackAlarmReceiver : BroadcastReceiver() {
             
             // Send fallback notification
             val message = MessageRepository.randomMessage(context)
-            NotificationHelper.showNow(context, "🆘 Fallback: $message")
+            NotificationHelper.showNow(context, message)
             
             // Mark as sent and track message
             PreferenceManager.markNotificationSentToday(context)
